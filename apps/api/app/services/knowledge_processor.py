@@ -8,6 +8,7 @@ from app.services.chunking import split_text_into_chunks
 from sqlalchemy.orm import Session
 
 from app.models.knowledge_chunk import KnowledgeChunk
+from app.services.embedding import generate_embedding
 
 def detect_file_type(
     file_path: str
@@ -120,6 +121,9 @@ def save_chunks_to_database(
             organization_id=organization_id,
             knowledge_source_id=knowledge_source_id,
             text=chunk["text"],
+            embedding=generate_embedding(
+                chunk["text"]
+            ),
             page_number=chunk["page_number"],
             metadata_json={}
         )
