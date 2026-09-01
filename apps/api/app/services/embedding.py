@@ -1,4 +1,7 @@
 from sentence_transformers import SentenceTransformer
+from sqlalchemy.orm import Session
+
+from app.models.knowledge_chunk import KnowledgeChunk
 
 
 _model = None
@@ -29,3 +32,34 @@ def generate_embedding(
     )
 
     return embedding.tolist()
+
+
+
+def regenerate_chunk_embeddings(
+    db: Session
+):
+
+    chunks = (
+        db.query(KnowledgeChunk)
+        .filter(
+            KnowledgeChunk.embedding.is_(None)
+        )
+        .all()
+    )
+
+
+    updated = 0
+
+
+    for chunk in chunks:
+
+        chunk.embedding = generate_embedding(
+            chunk.text
+        )
+
+        updated += 1
+
+
+    db.commit()
+
+    return updated

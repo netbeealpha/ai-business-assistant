@@ -2,14 +2,15 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    String,
     DateTime,
     ForeignKey,
     Integer,
     Boolean,
-    JSON,
-    Text
+    Text,
+    JSON
 )
+
+from pgvector.sqlalchemy import Vector
 
 from sqlalchemy.orm import (
     Mapped,
@@ -57,7 +58,7 @@ class KnowledgeChunk(Base):
 
 
     embedding: Mapped[list | None] = mapped_column(
-        JSON,
+        Vector(384),
         nullable=True
     )
 
