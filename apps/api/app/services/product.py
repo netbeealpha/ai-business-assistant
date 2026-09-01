@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
 from app.models.product import Product
-from app.schemas.product import ProductCreate
+from app.schemas.product import (ProductCreate, ProductUpdate)
+
 
 
 
@@ -52,3 +53,34 @@ def get_product(
         )
         .first()
     )
+
+
+def update_product(
+    db:Session,
+    product:Product,
+    product_data: ProductUpdate
+
+):
+    update_data = product_data.model_dump(
+        exclude_unset=True
+    )
+
+    for key, value in update_data.items():
+        setattr(product, key, value)
+
+    db.commit()
+
+    db.refresh(product)
+
+    return product
+
+def delete_product(
+    db: Session,
+    product: Product
+):
+
+    db.delete(product)
+
+    db.commit()
+
+    return True

@@ -2,130 +2,145 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
-from app.schemas.product import (ProductCreate,ProductUpdate, ProductResponse)
-from app.services.product import (create_product, get_products, get_product, update_product, delete_product)
+from app.schemas.faq import (
+    FAQCreate,
+    FAQUpdate,
+    FAQResponse
+)
+from app.services.faq import (
+    create_faq,
+    get_faqs,
+    get_faq,
+    update_faq,
+    delete_faq
+)
 from app.dependencies.auth import get_current_user
 from app.models.user import User
 
 
 router = APIRouter(
-    prefix="/products",
-    tags=["Products"]
+    prefix="/faqs",
+    tags=["FAQs"]
 )
 
 
 @router.post(
     "",
-    response_model=ProductResponse
+    response_model=FAQResponse
 )
-def create_new_product(
-    product: ProductCreate,
+def create_new_faq(
+    faq: FAQCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
 
-    return create_product(
+    return create_faq(
         db=db,
-        product_data=product,
+        faq_data=faq,
         organization_id=current_user.organization_id
     )
+
 
 
 @router.get(
     "",
-    response_model=list[ProductResponse]
+    response_model=list[FAQResponse]
 )
-def read_products(
+def read_faqs(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
 
-    return get_products(
+    return get_faqs(
         db=db,
         organization_id=current_user.organization_id
     )
+
 
 
 @router.get(
-    "/{product_id}",
-    response_model=ProductResponse
+    "/{faq_id}",
+    response_model=FAQResponse
 )
-def read_product(
-    product_id: int,
+def read_faq(
+    faq_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
 
-    product = get_product(
+    faq = get_faq(
         db=db,
-        product_id=product_id,
+        faq_id=faq_id,
         organization_id=current_user.organization_id
     )
 
-    if product is None:
+    if faq is None:
         raise HTTPException(
             status_code=404,
-            detail="Product not found"
+            detail="FAQ not found"
         )
 
-    return product
+    return faq
+
+
 
 @router.put(
-    "/{product_id}",
-    response_model=ProductResponse
+    "/{faq_id}",
+    response_model=FAQResponse
 )
-def update_existing_product(
-    product_id: int,
-    product_data: ProductUpdate,
+def update_existing_faq(
+    faq_id: int,
+    faq_data: FAQUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
 
-    product = get_product(
+    faq = get_faq(
         db=db,
-        product_id=product_id,
+        faq_id=faq_id,
         organization_id=current_user.organization_id
     )
 
-    if product is None:
+    if faq is None:
         raise HTTPException(
             status_code=404,
-            detail="Product not found"
+            detail="FAQ not found"
         )
 
-    return update_product(
+    return update_faq(
         db=db,
-        product=product,
-        product_data=product_data
+        faq=faq,
+        faq_data=faq_data
     )
+
 
 
 @router.delete(
-    "/{product_id}"
+    "/{faq_id}"
 )
-def delete_existing_product(
-    product_id: int,
+def delete_existing_faq(
+    faq_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
 
-    product = get_product(
+    faq = get_faq(
         db=db,
-        product_id=product_id,
+        faq_id=faq_id,
         organization_id=current_user.organization_id
     )
 
-    if product is None:
+    if faq is None:
         raise HTTPException(
             status_code=404,
-            detail="Product not found"
+            detail="FAQ not found"
         )
 
-    delete_product(
+    delete_faq(
         db=db,
-        product=product
+        faq=faq
     )
 
     return {
-        "message": "Product deleted successfully"
+        "message": "FAQ deleted successfully"
     }

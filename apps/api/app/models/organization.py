@@ -14,6 +14,9 @@ from app.database.connection import Base
 if TYPE_CHECKING:
     from app.models.user import User
     from app.models.product import Product
+    from app.models.faq import FAQ
+    from app.models.knowledge_source import KnowledgeSource
+    from app.models.knowledge_chunk import KnowledgeChunk
 
 
 class Organization(Base):
@@ -59,5 +62,16 @@ class Organization(Base):
 
     # Relationship with products
     products: Mapped[list["Product"]] = relationship(
+        back_populates="organization"
+    )
+
+    faqs: Mapped[list["FAQ"]] = relationship(
+        back_populates="organization"
+    )
+
+    knowledge_sources: Mapped[list["KnowledgeSource"]] = relationship(
+        back_populates="organization"
+    )
+    knowledge_chunks: Mapped[list["KnowledgeChunk"]] = relationship(
         back_populates="organization"
     )
