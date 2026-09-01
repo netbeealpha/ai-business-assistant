@@ -1,5 +1,5 @@
 from pathlib import Path
-import fitz
+import pymupdf
 from docx import Document
 
 
@@ -25,7 +25,7 @@ def extract_text_from_pdf(
     file_path: str
 ) -> list[dict]:
 
-    document = fitz.open(file_path)
+    document = pymupdf.open(file_path)
 
     pages = []
 

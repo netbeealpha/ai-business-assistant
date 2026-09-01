@@ -17,6 +17,9 @@ from app.services.upload import (
     save_uploaded_file,
     create_knowledge_source_record
 )
+from app.services.knowledge_processor import (
+    process_knowledge_source
+)
 
 from app.dependencies.auth import get_current_user
 from app.models.user import User
@@ -59,6 +62,12 @@ def upload_file(
         db=db,
         file_info=file_info,
         organization_id=current_user.organization_id
+    )
+    db.refresh(source)
+
+    process_knowledge_source(
+        db=db,
+        knowledge_source=source
     )
 
 
