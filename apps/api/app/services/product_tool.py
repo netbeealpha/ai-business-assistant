@@ -10,7 +10,8 @@ def search_products(
     organization_id: int,
     limit: int = 5
 ):
-
+    print("PRODUCT TOOL QUERY😊:", query)
+    print("ORGANIZATION:😂", organization_id)
     search_term = f"%{query}%"
 
 

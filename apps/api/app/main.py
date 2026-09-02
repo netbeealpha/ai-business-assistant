@@ -11,12 +11,14 @@ from app.routers.faqs import router as faq_router
 from app.routers.knowledge_sources import router as knowledge_source_router
 from app.routers.upload import router as upload_router
 from app.routers.knowledge_chunks import router as knowledge_chunk_router
+from app.routers.chat import router as chat_router
+from app.services.tools.register import register_all_tools
 
 app = FastAPI(
     title="AI Business Assistant API",
     version="0.1.0"
 )
-
+register_all_tools()
 # Register API routers
 app.include_router(organization_router)
 app.include_router(auth_router)
@@ -26,6 +28,7 @@ app.include_router(faq_router)
 app.include_router(knowledge_source_router)
 app.include_router(upload_router)
 app.include_router(knowledge_chunk_router)
+app.include_router(chat_router)
 
 @app.get("/health")
 def health_check():

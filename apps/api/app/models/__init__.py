@@ -4,3 +4,5 @@ from .product import Product
 from .faq import FAQ
 from .knowledge_source import KnowledgeSource
 from .knowledge_chunk import KnowledgeChunk
+from .conversation import Conversation
+from .message import Message

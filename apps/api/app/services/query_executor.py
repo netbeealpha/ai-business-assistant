@@ -1,38 +1,55 @@
 from sqlalchemy.orm import Session
 
 from app.services.query_router import classify_query
-
 from app.services.product_tool import search_products
-
 from app.services.retrieval import retrieve_relevant_chunks
-
-from app.services.entity_extractor import (
-    extract_product_entity
-)
+from app.services.entity_extractor import extract_product_entity
 
 
 
 def execute_query(
     db: Session,
     query: str,
-    organization_id: int
+    organization_id: int,
+    followup_intent: str = "general"
 ):
 
     intent = classify_query(
         query
     )
 
-
+    print(
+        "EXECUTOR FOLLOWUP INTENT:",
+        followup_intent
+    )
     response = {
         "product_results": [],
-        "knowledge_results": []
+        "knowledge_results": [],
+        "followup_intent": followup_intent
     }
+
+
+    if (
+        not intent.is_product
+        and not intent.is_knowledge
+        and len(query.split()) <= 3
+    ):
+        intent.is_product = True
 
 
     if intent.is_product:
 
+        print("PRODUCT INTENT DETECTED")
+
+
         product_query = extract_product_entity(
             query
+        )
+
+
+        print(
+            "EXTRACTED PRODUCT:",
+            product_query
         )
 
 

@@ -1,7 +1,6 @@
 from app.schemas.query import QueryIntent
 
 
-
 def classify_query(
     query: str
 ) -> QueryIntent:

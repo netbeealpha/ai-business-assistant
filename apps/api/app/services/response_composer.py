@@ -1,34 +1,56 @@
 def compose_product_response(
-    products: list[dict]
+    products: list[dict],
+    intent: str = "general"
 ) -> str:
 
     if not products:
-
         return "No matching product found."
 
 
-    responses = []
+    product = products[0]
 
 
-    for product in products:
+    if intent == "availability":
 
-        responses.append(
-            f"""
-Product: {product['name']}
-Brand: {product.get('brand', 'N/A')}
-Category: {product.get('category', 'N/A')}
-Price: {product.get('sale_price', product.get('regular_price'))} {product.get('currency', '')}
-Stock: {product.get('stock_status', 'unknown')}
-Available Quantity: {product.get('stock_quantity', 'N/A')}
-SKU: {product.get('sku', 'N/A')}
-"""
+        return (
+            f"{product['name']} is "
+            f"{product['stock_status']}.\n"
+            f"Available quantity: "
+            f"{product['stock_quantity']}"
         )
 
 
-    return "\n".join(
-        responses
-    ).strip()
+    if intent == "price":
 
+        return (
+            f"{product['name']} price is "
+            f"{product['sale_price']} "
+            f"{product['currency']}."
+        )
+
+
+    if intent == "details":
+
+        return (
+            f"Product: {product['name']}\n"
+            f"Brand: {product.get('brand')}\n"
+            f"Category: {product.get('category')}\n"
+            f"Description: {product.get('description')}"
+        )
+
+
+    # default response
+
+    return (
+        f"Product: {product['name']}\n"
+        f"Brand: {product.get('brand', 'N/A')}\n"
+        f"Category: {product.get('category', 'N/A')}\n"
+        f"Price: {product.get('sale_price')} "
+        f"{product.get('currency', '')}\n"
+        f"Stock: {product.get('stock_status', 'unknown')}\n"
+        f"Available Quantity: {product.get('stock_quantity', 'N/A')}\n"
+        f"SKU: {product.get('sku', 'N/A')}"
+    )
 
 def compose_knowledge_response(
     chunks: list[dict]
@@ -68,18 +90,20 @@ Chunk ID:
 def compose_response(
     result: dict
 ) -> str:
-
+    print("COMPOSER INPUT:❤️", result)
 
     responses = []
 
 
     if result.get("product_results"):
 
-        responses.append(
-            compose_product_response(
-                result["product_results"]
-            )
+        product_response = compose_product_response(
+            result["product_results"],
+            result.get("followup_intent", "general")
         )
+
+        if product_response:
+            responses.append(product_response)
 
 
     if result.get("knowledge_results"):
