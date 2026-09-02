@@ -1,6 +1,11 @@
+from app.schemas.query import QueryIntent
+
+
+
 def classify_query(
     query: str
-) -> str:
+) -> QueryIntent:
+
 
     query_lower = query.lower()
 
@@ -17,11 +22,43 @@ def classify_query(
     ]
 
 
-    for keyword in product_keywords:
+    knowledge_keywords = [
+        "who is",
+        "how to",
+        "policy",
+        "manual",
+        "guide",
+        "company",
+        "information",
+        "explain"
+    ]
 
-        if keyword in query_lower:
 
-            return "product"
+    is_product = any(
+        keyword in query_lower
+        for keyword in product_keywords
+    )
 
 
-    return "knowledge"
+    is_knowledge = any(
+        keyword in query_lower
+        for keyword in knowledge_keywords
+    )
+
+
+    # Handle general "what is" knowledge questions
+    if (
+        "what is" in query_lower
+        and not is_product
+    ):
+        is_knowledge = True
+
+
+    # Product queries have priority
+    if is_product:
+        is_knowledge = False
+
+    return QueryIntent(
+        is_product=is_product,
+        is_knowledge=is_knowledge
+    )

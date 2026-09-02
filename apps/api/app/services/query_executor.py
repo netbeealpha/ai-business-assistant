@@ -10,62 +10,46 @@ from app.services.entity_extractor import (
     extract_product_entity
 )
 
+
+
 def execute_query(
     db: Session,
     query: str,
     organization_id: int
 ):
 
-    print("1. executor started")
-
-
-    query_type = classify_query(
+    intent = classify_query(
         query
     )
 
-    print("2. query type:", query_type)
+
+    response = {
+        "product_results": [],
+        "knowledge_results": []
+    }
 
 
-    if query_type == "product":
-
-        print("3. extracting product entity")
-
+    if intent.is_product:
 
         product_query = extract_product_entity(
             query
         )
 
-        print("4. extracted:", product_query)
 
-
-        print("5. searching product")
-
-
-        results = search_products(
+        response["product_results"] = search_products(
             db=db,
             query=product_query,
             organization_id=organization_id
         )
 
 
-        print("6. product search completed")
+    if intent.is_knowledge:
+
+        response["knowledge_results"] = retrieve_relevant_chunks(
+            db=db,
+            query=query,
+            organization_id=organization_id
+        )
 
 
-        return {
-            "type": "product",
-            "results": results
-        }
-
-
-    else:
-
-        print("knowledge path")
-
-        return {
-            "type": "knowledge",
-            "results": retrieve_relevant_chunks(
-                db=db,
-                query=query,
-                organization_id=organization_id
-            )
-        }
+    return response
