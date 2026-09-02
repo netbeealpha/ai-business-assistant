@@ -19,7 +19,9 @@ from app.services.answer_context import (
 from app.services.answer_generator import (
     generate_answer
 )
-
+from app.services.citation_extractor import (
+    extract_citations
+)
 
 
 def ask_assistant(
@@ -72,6 +74,10 @@ def ask_assistant(
         agent_result
     )
 
+    sources = extract_citations(
+        result
+    )
+
 
     print(
         "NORMALIZED RESULT:",
@@ -98,4 +104,7 @@ def ask_assistant(
     )
 
 
-    return response
+    return {
+        "answer": response,
+        "sources": sources
+    }

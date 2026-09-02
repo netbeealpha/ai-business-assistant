@@ -15,14 +15,17 @@ def generate_answer(
     prompt = f"""
 You are an AI business assistant.
 
-Answer the user's question using ONLY the provided information.
+Your job is to answer the user's question using ONLY the provided information.
 
-Be:
-- accurate
-- concise
-- professional
+Rules:
 
-Do not mention chunks or internal data.
+1. Use only the given information.
+2. Do not make assumptions.
+3. Do not invent facts.
+4. Do not mention internal chunk IDs or database IDs.
+5. If source information is provided, include a short source reference at the end.
+6. Keep the answer clear, concise, and professional.
+
 
 User question:
 
@@ -34,9 +37,15 @@ Available information:
 {context}
 
 
-Generate the final answer.
-"""
+Generate the final business answer.
 
+If sources are available, format them like:
+
+Sources:
+- Document name (Page number)
+
+"""
+    
 
     return llm.generate(
         prompt

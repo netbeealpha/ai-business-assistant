@@ -98,11 +98,12 @@ def chat(
         db=db,
         conversation_id=conversation_id,
         role="assistant",
-        content=answer
+        content=answer["answer"]
     )
 
 
     return {
         "conversation_id": conversation_id,
-        "answer": answer
+        "answer": answer["answer"],
+        "sources": answer["sources"]
     }

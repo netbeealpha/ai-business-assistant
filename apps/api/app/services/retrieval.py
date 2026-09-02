@@ -24,12 +24,20 @@ def retrieve_relevant_chunks(
 
     for chunk in chunks:
 
+        source = chunk.knowledge_source
+
+
         results.append(
             {
-                "chunk_id": chunk.id,
-                "source_id": chunk.knowledge_source_id,
                 "text": chunk.text,
-                "page_number": chunk.page_number
+
+                "citation": {
+                    "source_id": source.id,
+                    "title": source.title,
+                    "document": source.file_name,
+                    "page_number": chunk.page_number,
+                    "version": source.version
+                }
             }
         )
 

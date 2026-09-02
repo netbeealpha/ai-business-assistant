@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from app.schemas.citation import Citation
+
 
 
 class ChatRequest(BaseModel):
@@ -15,3 +17,5 @@ class ChatResponse(BaseModel):
     conversation_id: int
 
     answer: str
+
+    sources: list[Citation] = []
