@@ -1,23 +1,35 @@
-from sentence_transformers import SentenceTransformer
-from sqlalchemy.orm import Session
+import torch
 
-from app.models.knowledge_chunk import KnowledgeChunk
+from transformers import AutoTokenizer, AutoModel
 
 
 _model = None
+_tokenizer = None
+
+
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+
 
 
 def get_embedding_model():
 
-    global _model
+    global _model, _tokenizer
+
 
     if _model is None:
 
-        _model = SentenceTransformer(
-            "all-MiniLM-L6-v2"
+        _tokenizer = AutoTokenizer.from_pretrained(
+            MODEL_NAME
         )
 
-    return _model
+        _model = AutoModel.from_pretrained(
+            MODEL_NAME
+        )
+
+        _model.eval()
+
+
+    return _tokenizer, _model
 
 
 
@@ -25,41 +37,50 @@ def generate_embedding(
     text: str
 ) -> list[float]:
 
-    model = get_embedding_model()
 
-    embedding = model.encode(
-        text
-    )
-
-    return embedding.tolist()
+    tokenizer, model = get_embedding_model()
 
 
-
-def regenerate_chunk_embeddings(
-    db: Session
-):
-
-    chunks = (
-        db.query(KnowledgeChunk)
-        .filter(
-            KnowledgeChunk.embedding.is_(None)
-        )
-        .all()
+    inputs = tokenizer(
+        text,
+        padding=True,
+        truncation=True,
+        return_tensors="pt"
     )
 
 
-    updated = 0
+    with torch.no_grad():
 
-
-    for chunk in chunks:
-
-        chunk.embedding = generate_embedding(
-            chunk.text
+        outputs = model(
+            **inputs
         )
 
-        updated += 1
+
+    token_embeddings = outputs.last_hidden_state
+
+    attention_mask = inputs["attention_mask"]
 
 
-    db.commit()
+    mask = attention_mask.unsqueeze(
+        -1
+    ).expand(
+        token_embeddings.size()
+    ).float()
 
-    return updated
+
+    summed = torch.sum(
+        token_embeddings * mask,
+        dim=1
+    )
+
+
+    counts = torch.clamp(
+        mask.sum(dim=1),
+        min=1e-9
+    )
+
+
+    embedding = summed / counts
+
+
+    return embedding[0].tolist()
